@@ -5,5 +5,6 @@
 
 embeds.xml
 ConflictsManagement.lua
+Questionnaire.lua
 ColLabWoW.lua
 UserInterface.lua

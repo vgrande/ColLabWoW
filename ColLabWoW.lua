@@ -57,7 +57,7 @@ end
   -- For messages received through an addon channel
   if (event == "CHAT_MSG_ADDON") then
     ColLabEventChat_Msg_Addon(frame,event,...)
-    
+
   -- For messages received through a standard channel
   elseif (event == "CHAT_MSG_WHISPER") then -- Testing, should be changed to PARTY, etc.
     -- Event signature ("message", "sender", "language", "channelString", "target", "flags", 
@@ -107,6 +107,7 @@ SlashCmdList["COLLABWOWCREATE"] = function ()
   addon:startConflict()
  end
 
+
 SLASH_COLLABWOWJOIN1 = "/clwj"
 SLASH_COLLABWOWJOIN2 = "/collabwowjoin"
 SlashCmdList["COLLABWOWJOIN"] = function ()
@@ -119,6 +120,16 @@ SlashCmdList["COLLABWOWJOIN"] = function ()
     end
   end
 end
+
+SLASH_COLLABWOWQUESTIONNAIRE1 = "/clwq"
+SLASH_COLLABWOWQUESTIONNAIRE2 = "/collabwowquestionnaire"
+SlashCmdList["COLLABWOWQUESTIONNAIRE"] = function ()
+	print "Preparing questionnaire"
+	addon:showQuestionnaire()
+end
+
+
+
 
 -- Shows a column in another window with the participants of the discussion
 SLASH_PARTICIPANTS1 = "/clwpar"
