@@ -1,0 +1,9 @@
+## Interface: 50300
+## Title: ColLabWoW
+## Notes: Allows in-game collaborative decision making
+# SavedVariablesPerCharacter: BagBuddy_ItemTime
+
+embeds.xml
+ConflictsManagement.lua
+ColLabWoW.lua
+UserInterface.lua

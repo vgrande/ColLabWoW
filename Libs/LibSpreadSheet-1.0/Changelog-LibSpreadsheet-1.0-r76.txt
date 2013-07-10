@@ -1,0 +1,527 @@
+------------------------------------------------------------------------
+r76 | humbedooh | 2010-09-16 02:09:59 +0000 (Thu, 16 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Fixed the broken garbage collector
+Added frame checks for Render_Update
+------------------------------------------------------------------------
+r75 | humbedooh | 2010-09-15 17:34:34 +0000 (Wed, 15 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Updated the custom OnEnter/OnLeave callbacks from cells.
+------------------------------------------------------------------------
+r74 | humbedooh | 2010-09-15 15:06:02 +0000 (Wed, 15 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added OnEnter and OnLeave callbacks for cells (interactive sheets will override these)
+------------------------------------------------------------------------
+r73 | humbedooh | 2010-09-14 11:44:44 +0000 (Tue, 14 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Forgot to add the != control functions to COUNTIF and SUMIF, how silly of me.
+------------------------------------------------------------------------
+r72 | humbedooh | 2010-09-14 11:39:59 +0000 (Tue, 14 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added SUMIF() and COUNTIF() to the list of formula functions
+------------------------------------------------------------------------
+r71 | humbedooh | 2010-09-14 10:56:53 +0000 (Tue, 14 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added 'OnClick' to the list of custom cell callback events
+Added [book]:SetGlobalCallback() for setting callbacks on all sheets
+------------------------------------------------------------------------
+r70 | humbedooh | 2010-09-13 22:48:34 +0000 (Mon, 13 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added COUNT([range]) to the list of math functions, since it was...missing :/
+------------------------------------------------------------------------
+r69 | humbedooh | 2010-09-13 22:04:23 +0000 (Mon, 13 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added checks in DeleteFrame() for properly purging Slider frames
+------------------------------------------------------------------------
+r68 | humbedooh | 2010-09-13 13:41:02 +0000 (Mon, 13 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added a check to ignore updates of non-existent containers.
+------------------------------------------------------------------------
+r67 | humbedooh | 2010-09-09 11:11:53 +0000 (Thu, 09 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Updated the garbage collector
+------------------------------------------------------------------------
+r66 | humbedooh | 2010-09-08 14:19:06 +0000 (Wed, 08 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Changed the scope of the frame handler
+Added a garbage collector of sorts to speed up log-outs and UI reloads
+------------------------------------------------------------------------
+r65 | humbedooh | 2010-09-06 09:55:43 +0000 (Mon, 06 Sep 2010) | 4 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Fixed a ton of graphical glitches in the base frames
+Removed the background texture when style is set to "table"
+Fixed the horizontal scrollbar so it won't pop up when it's not needed
+Fixed a bug in SortByColumn() that was causing bad comparisons
+------------------------------------------------------------------------
+r64 | humbedooh | 2010-09-06 08:48:49 +0000 (Mon, 06 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added support for "link" type cells (item, spells etc).
+------------------------------------------------------------------------
+r63 | humbedooh | 2010-09-06 07:48:04 +0000 (Mon, 06 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/.pkgmeta
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Tweaked [book]:Close() and [sheet]:Unload() to remove a ton of overhead (resulting in 60% smaller files)
+------------------------------------------------------------------------
+r62 | humbedooh | 2010-09-05 15:08:40 +0000 (Sun, 05 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Changed column type checks to include cell type checks in data functions.
+------------------------------------------------------------------------
+r61 | humbedooh | 2010-09-05 01:38:43 +0000 (Sun, 05 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Fixed a typo in [book]:Close()
+------------------------------------------------------------------------
+r60 | humbedooh | 2010-09-05 00:55:23 +0000 (Sun, 05 Sep 2010) | 3 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Updated range selection checks
+Added context menu hook [book]:ContextFunction(func)
+Added [sheet]Freeze(toggle, col, row) for freezing panes in interactive mode.
+------------------------------------------------------------------------
+r59 | humbedooh | 2010-09-04 04:31:56 +0000 (Sat, 04 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added AddColumnAt(), AddRowAt()
+Fixed some visual bugs in DeleteColumn()
+------------------------------------------------------------------------
+r58 | humbedooh | 2010-09-04 04:08:39 +0000 (Sat, 04 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added functions GetSelectedRows(), GetSelectedCols()
+Added support for cell prefix
+------------------------------------------------------------------------
+r57 | humbedooh | 2010-09-03 19:34:27 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Added initial support for math functions refering to other cells with math functions (i.e. C2 = SUM(A1:B4), C3 = C2*3).
+------------------------------------------------------------------------
+r56 | humbedooh | 2010-09-03 19:06:31 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+- Added rudimentary support for dropping items and spells into cells.
+------------------------------------------------------------------------
+r55 | humbedooh | 2010-09-03 18:27:38 +0000 (Fri, 03 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+- Added math functions; Health(), Power(), MaxHealth(), MaxPower(), Money(), Level(), Armor(), Class(), Race(), MobType(), Name(), Strength(), Agility(), Stamina(), Intellect(), Spirit()
+- Added check to ensure that only strings, numbers and booleans can be passed (no pesky WoW macro viruses plox!)
+------------------------------------------------------------------------
+r54 | humbedooh | 2010-09-03 14:19:58 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Fixed some wonky scrolling
+------------------------------------------------------------------------
+r53 | humbedooh | 2010-09-03 13:00:46 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Fixed some bugs when rendering saved books/sheets.
+------------------------------------------------------------------------
+r52 | humbedooh | 2010-09-03 10:48:34 +0000 (Fri, 03 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Lots and lots of changes, too much to bother writing about right now ;|
+------------------------------------------------------------------------
+r51 | humbedooh | 2010-09-01 14:50:03 +0000 (Wed, 01 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r50 | humbedooh | 2010-09-01 00:23:04 +0000 (Wed, 01 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r49 | humbedooh | 2010-08-31 19:53:09 +0000 (Tue, 31 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r48 | humbedooh | 2010-08-31 17:35:18 +0000 (Tue, 31 Aug 2010) | 2 lines
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Added the sheet:Export(format, from, to) function for exporting formatted data.
+* Added a few checks to the visual functions
+------------------------------------------------------------------------
+r47 | humbedooh | 2010-08-31 06:40:36 +0000 (Tue, 31 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r46 | humbedooh | 2010-08-30 23:08:19 +0000 (Mon, 30 Aug 2010) | 2 lines
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Changed filtering rules to: =, ~=, >, <, >=, <=
+* Changed UNIQUE() to work on both cell ranges and lists passed manually
+------------------------------------------------------------------------
+r45 | humbedooh | 2010-08-30 17:31:28 +0000 (Mon, 30 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Added texcoords property to cell icons.
+------------------------------------------------------------------------
+r44 | humbedooh | 2010-08-29 23:22:35 +0000 (Sun, 29 Aug 2010) | 2 lines
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Fixed a typo in the MEDIAN() function.
+* Added proper support for MODE()
+------------------------------------------------------------------------
+r43 | humbedooh | 2010-08-29 23:14:34 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Fixed a bug in STDEV() that caused an incorrect standard deviation to be returned.
+------------------------------------------------------------------------
+r41 | humbedooh | 2010-08-29 22:54:06 +0000 (Sun, 29 Aug 2010) | 2 lines
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+* Added a check to ignore $ symbols in macro parsing (as it will only be needed if macros are moved)
+* Added proper support for parentheses - Macros like =(SUM(D1:F4)*(2 + SQRT(5))) will now work.
+------------------------------------------------------------------------
+r40 | humbedooh | 2010-08-29 22:41:37 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r39 | humbedooh | 2010-08-29 22:38:37 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+Macros, woohoo!
+------------------------------------------------------------------------
+r38 | humbedooh | 2010-08-29 11:01:17 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r37 | humbedooh | 2010-08-29 10:54:40 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r36 | humbedooh | 2010-08-29 02:25:08 +0000 (Sun, 29 Aug 2010) | 1 line
+Changed paths:
+   M /trunk
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r35 | humbedooh | 2010-08-28 19:24:41 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r34 | humbedooh | 2010-08-28 08:54:00 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.toc
+   D /trunk/LibSpreadsheet-1.0.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r33 | humbedooh | 2010-08-28 05:39:25 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r31 | humbedooh | 2010-08-28 05:01:22 +0000 (Sat, 28 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r30 | humbedooh | 2010-08-27 07:13:24 +0000 (Fri, 27 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r29 | humbedooh | 2010-08-27 04:03:28 +0000 (Fri, 27 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+
+1600 lines of grotesque gluttony!
+------------------------------------------------------------------------
+r28 | humbedooh | 2010-08-27 03:47:31 +0000 (Fri, 27 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+I've created a monster! A MONSTER! :/
+------------------------------------------------------------------------
+r27 | humbedooh | 2010-08-26 22:41:44 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r26 | humbedooh | 2010-08-26 14:14:10 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r25 | humbedooh | 2010-08-26 13:55:06 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r24 | humbedooh | 2010-08-26 13:30:03 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r23 | humbedooh | 2010-08-26 02:05:54 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r22 | humbedooh | 2010-08-26 01:49:13 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r21 | humbedooh | 2010-08-26 00:34:25 +0000 (Thu, 26 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r20 | humbedooh | 2010-08-25 14:51:57 +0000 (Wed, 25 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r19 | humbedooh | 2010-08-25 14:39:22 +0000 (Wed, 25 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r18 | humbedooh | 2010-08-25 02:45:10 +0000 (Wed, 25 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r17 | humbedooh | 2010-08-25 01:55:02 +0000 (Wed, 25 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r16 | humbedooh | 2010-08-25 00:33:00 +0000 (Wed, 25 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r15 | humbedooh | 2010-08-24 23:27:16 +0000 (Tue, 24 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r14 | humbedooh | 2010-08-24 22:35:32 +0000 (Tue, 24 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r13 | humbedooh | 2010-08-24 03:05:00 +0000 (Tue, 24 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r12 | humbedooh | 2010-08-23 23:10:52 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r11 | humbedooh | 2010-08-23 17:07:56 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+   M /trunk/LibSpreadsheet-1.0.toc
+
+See change-log for changes.
+------------------------------------------------------------------------
+r10 | humbedooh | 2010-08-23 16:38:43 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r9 | humbedooh | 2010-08-23 16:08:43 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r8 | humbedooh | 2010-08-23 14:56:38 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r7 | humbedooh | 2010-08-23 03:38:53 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet-1.0.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r6 | humbedooh | 2010-08-23 00:52:39 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   A /trunk/LibSpreadsheet-1.0.lua
+   A /trunk/LibSpreadsheet-1.0.toc
+   A /trunk/LibSpreadsheet-1.0.xml
+   D /trunk/LibSpreadsheet.lua
+   D /trunk/LibSpreadsheet.toc
+   D /trunk/LibSpreadsheet.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r5 | humbedooh | 2010-08-23 00:42:51 +0000 (Mon, 23 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r4 | humbedooh | 2010-08-22 23:47:40 +0000 (Sun, 22 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r3 | humbedooh | 2010-08-22 22:41:34 +0000 (Sun, 22 Aug 2010) | 1 line
+Changed paths:
+   M /trunk/Docs/Changelog.txt
+   M /trunk/LibSpreadsheet.lua
+
+See change-log for changes.
+------------------------------------------------------------------------
+r2 | humbedooh | 2010-08-22 14:14:47 +0000 (Sun, 22 Aug 2010) | 1 line
+Changed paths:
+   A /trunk/.pkgmeta
+   A /trunk/Docs
+   A /trunk/Docs/Changelog.txt
+   A /trunk/LibSpreadsheet.lua
+   A /trunk/LibSpreadsheet.toc
+   A /trunk/LibSpreadsheet.xml
+
+See change-log for changes.
+------------------------------------------------------------------------
+r1 | root | 2010-08-21 21:10:21 +0000 (Sat, 21 Aug 2010) | 1 line
+Changed paths:
+   A /branches
+   A /tags
+   A /trunk
+
+"libspreadsheet/mainline: Initial Import"
+------------------------------------------------------------------------

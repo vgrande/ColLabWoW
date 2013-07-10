@@ -1,0 +1,12 @@
+## Interface: 50001
+## LoadOnDemand: 1
+## Title: Lib: LibSyncTime-1.0
+## Notes: Library that provides a timestamp that is equal across clients' timezones and system clocks
+## Author: stolenlegacy
+## OptionalDeps: LibStub
+## X-Curse-Packaged-Version: r7
+## X-Curse-Project-Name: LibSyncTime-1.0
+## X-Curse-Project-ID: libsynctime-1-0
+## X-Curse-Repository-ID: wow/libsynctime-1-0/mainline
+LibStub\LibStub.lua
+LibSyncTime-1.0\lib.xml

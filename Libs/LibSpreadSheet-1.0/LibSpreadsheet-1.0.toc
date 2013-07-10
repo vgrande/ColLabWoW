@@ -1,0 +1,11 @@
+﻿## Interface: 30300
+## Title: LibSpreadsheet
+## Notes: Spreadsheet extravaganza
+## Author: Humbedooh
+## X-Curse-Packaged-Version: r76
+## X-Curse-Project-Name: LibSpreadsheet
+## X-Curse-Project-ID: libspreadsheet
+## X-Curse-Repository-ID: wow/libspreadsheet/mainline
+
+# core files
+LibSpreadsheet-1.0.lua
