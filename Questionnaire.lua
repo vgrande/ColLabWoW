@@ -16,7 +16,7 @@ local max_Y = 400 --values for width and height of QFrame.
 local question = { --a table to hold the question/answer format
             prompt = nil,
             firstSelection = true,
-            buttonSet = {questionIterator = nil, },
+            buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,questionIterator = nil, },
             bText = {1,2,3,4,5,},
             buttonLogic = {
             [1] = false,
@@ -35,22 +35,15 @@ local nextQuestion = 1
 
 ------------------------------------------------------------------------------------------------------------------------------------
 function initQuestionnaire()
-   local NUM_QUESTIONS = 11
+   local NUM_QUESTIONS = 4
    local question_table = {
         "Question 1",
         "Question 2",
         "Question 3",
         "Question 4",
-        "Question 5",
-        "Question 6",
-        "Question 7",
-        "Question 8",
-        "Question 9",
-        "Question 10",
-        "Question 11",
     }
    for i = 1, NUM_QUESTIONS do
-    Q = {} --we do this INSIDE the for loop to reset Q's v  alue and reset the metatable
+   local Q = {} --we do this INSIDE the for loop to reset Q's v  alue and reset the metatable
     setmetatable(Q, {__index = question}) -- bases table Q off of question table (basically instantiating an object of type question)
     Q.prompt= question_table[i]
     table.insert(questions, i,Q) -- inserts a new "question" into our array of "questions"
@@ -59,16 +52,7 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 function RadioButton_OnClick(self)
     QI=self.questionIterator
-   --[[ if(QI==1)then
-        QI=5
-    elseif(QI==2)then
-        QI=4
-    elseif(QI==4)then
-        QI=2
-    elseif(QI==5)then
-        QI=1
-    end--]]
-    print (QI)
+    print ("QI = " .. QI)
 
 
     buttonIterator = nil
@@ -189,12 +173,16 @@ function addon:showQuestionnaire()
 	    qText[i]:SetText(questions[i].prompt)
 
 	    changeX=-200 --reset value of changeX for the next iteration of the following loop
-	    if not buttonsCreated then
+	    --if not buttonsCreated then
 	        for a=1, 5   do --5 buttons per question
-	            tempButton = CreateFrame("CheckButton", "RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
-	            table.insert(questions[i].buttonSet,a,tempButton)
-
-
+	            --VIRGINIA: this is the debug printout I showed you in the email.
+	            --This section creates a new set of buttons for every value in the "questions" array, but for some reason
+	            --it seems to vertically override the old buttons.
+	            --Happy hunting :\
+	            print (questions[i].buttonSet[a])
+	            questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
+	            print (questions[i].buttonSet[a])
+	            print ("------------------")
 	            questions[i].buttonSet[a].questionIterator = i
 	            questions[i].buttonSet[a]:SetHeight(20)
 	            questions[i].buttonSet[a]:SetWidth(20)
@@ -216,8 +204,10 @@ function addon:showQuestionnaire()
 	            --changeX increases each iteration of this loop to space out each radio button
 	            changeX = changeX + 100  --is += a thing in lua?
 	        end -- end radio-button creation (inner for loop)
-	    end
+	    --end
 	end -- end text creation(outer for loop)
+	print(questions[1].buttonSet[3] )
+	questions[1].buttonSet[3]:SetChecked(true)
 	endButton = CreateFrame("Button", "EndButton", QFrame, "GameMenuButtonTemplate")
 	endButton:ClearAllPoints()
 	endButton:SetPoint("BOTTOM", 0, 10)
