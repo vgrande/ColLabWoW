@@ -13,7 +13,7 @@
 ------------------------------------------------------------------------------------------
 
 -- To be able to use several files. This way functions can be stored in the table "addon"
--- and accessed from any file, as this table will be the same for every single file in 
+-- and accessed from any file, as this table will be the same for every single file in
 -- the same addon
 local addonName, addon = ...
 
@@ -60,7 +60,7 @@ end
 
   -- For messages received through a standard channel
   elseif (event == "CHAT_MSG_WHISPER") then -- Testing, should be changed to PARTY, etc.
-    -- Event signature ("message", "sender", "language", "channelString", "target", "flags", 
+    -- Event signature ("message", "sender", "language", "channelString", "target", "flags",
     -- unknown, channelNumber, "channelName", unknown, counter, "guid")
     local message = select (1, ...)
     local sender = select (2, ...)
@@ -104,7 +104,7 @@ ColLabWoW:RegisterEvent("CHAT_MSG_WHISPER") -- Testing, should be changed to PAR
 SLASH_COLLABWOWCREATE1 = "/clwc"
 SLASH_COLLABWOWCREATE2 = "/collabwowcreate"
 SlashCmdList["COLLABWOWCREATE"] = function ()
-  addon:startConflict()
+  addon:startDiscussion()
  end
 
 

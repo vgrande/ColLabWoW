@@ -126,7 +126,7 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["description"] = data
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["description"] ~= nil) then
-        addon.conflicts_active_testing[prefix].conflict_ui["description"]:SetText(data .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["description"]:SetText(data)
       end
     end
 
@@ -154,7 +154,7 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["options"][option_number] = option_value
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["options"] ~= nil) then
-        addon.conflicts_active_testing[prefix].conflict_ui["options"][option_number]:SetText(option_value .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["options"][option_number]:SetText(option_value)
       end
     end
       
@@ -168,7 +168,7 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["stakeholders_interests_names"][stakeholder_number] = {}
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["stakeholders"] ~= nil) then
-        addon.conflicts_active_testing[prefix].conflict_ui["stakeholders"][stakeholder_number]:SetText(stakeholder_name .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["stakeholders"][stakeholder_number]:SetText(stakeholder_name)
       end
     end
 
@@ -180,7 +180,7 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["posneg"][posneg_number] = posneg_value
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["posneg"] ~= nil) then
-        addon.conflicts_active_testing[prefix].conflict_ui["posneg"][posneg_number]:SetText(posneg_value .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["posneg"][posneg_number]:SetText(posneg_value)
       end
     end
 
@@ -194,7 +194,7 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["stakeholders_interests_values"][stakeholder_number][interest_number] = {}
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["interests"] ~= nil) then
-        addon.conflicts_active_testing[prefix].conflict_ui["interests"][stakeholder_number][interest_number]:SetText(interest_name .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["interests"][stakeholder_number][interest_number]:SetText(interest_name)
       end
     end
 
@@ -212,11 +212,10 @@ function updateTableValue(type, data, ... )
       addon.conflicts_active_testing[prefix].conflict_data["stakeholders_interests_values"][stakeholder_number][interest_number][posneg_number][consequence_number] = consequence_value
       -- If UI is already created, update the value of the text box
       if (addon.conflicts_active_testing[prefix].conflict_ui["consequences"] ~= nil) then
-        print ("Received " ..consequence_value)
-        addon.conflicts_active_testing[prefix].conflict_ui["consequences"][stakeholder_number][interest_number][posneg_number][consequence_number]:SetText(consequence_value .. "test")
+        addon.conflicts_active_testing[prefix].conflict_ui["consequences"][stakeholder_number][interest_number][posneg_number][consequence_number]:SetText(consequence_value)
       end
-    end   
-  end 
+    end
+  end
   return match
 end
 
@@ -242,7 +241,7 @@ function addon:createTableReceived ( ... )
     match = true
     -- Creation of main window for the discussion
     addon.conflicts_active_testing[prefix]= addon:createEditionWindow(prefix)
-    addon:createParticipantsWindow(prefix)
+    --addon:createParticipantsWindow(prefix)
   elseif (type == "upd" and (UnitName("player") == master)) then -- Send order to update a value of the table
     match = true
     SendAddonMessage(prefix, data, "WHISPER", sender) -- Testing, should be sent to the group
@@ -313,7 +312,7 @@ function checkVotes( ... )
   elseif (type == "sum" and data ~= nil and sender == master) then
     local votecode, number_of_votes  = data:match("(.+)=(%d)")
     addon.conflicts_active_testing[prefix].summary[votecode] = number_of_votes
-  end 
+  end
   return match
 end
 
@@ -325,15 +324,10 @@ end
 ------------------------------------------------------------------------------------------
 
 
-function  continue( prefix, group )
-    --local group = "PARTY" --TODO add different groups
-  -- Get group name
-  --local groupName = GetGuildInfo((UnitName("player"))) -- Testing below
-  --local groupName, grouptype = "MyGuild", "Guild" -- TODO getGroupInfo(), hardcoded now
-  --local prefix = GenerateChannelName(groupName, grouptype)
+function continueCreateDiscussion( prefix, group )
   local success = RegisterAddonMessagePrefix(prefix)
   if (success) then
-   ColLabWoW:RegisterEvent("CHAT_MSG_ADDON")
+    ColLabWoW:RegisterEvent("CHAT_MSG_ADDON")
     print ("Group is " .. group)
     addon.conflicts_active[prefix] = { master = (UnitName("player")), -- who has the master copy of the data
                               group = group, -- Guild, Raid, Party
@@ -343,15 +337,16 @@ function  continue( prefix, group )
                               votes = {}, -- List of the votes, only on the master's copy
                               summary = {},
     }
+	-- TODO Store timestamp for participants
     addon.conflicts_active[prefix].participants[(UnitName("player"))] = false -- Join discussion and false that it has finished the first stage (editing stage)
     -- Inform other clients to what prefix to subscribe
     -- SendChatMessage("I want to start a conflict using prefix " .. addon_prefix, group) -- Testing below
     SendChatMessage("I want to start a discussion using prefix " .. prefix, "WHISPER", "Common", (UnitName("player")))
-    --SendAddonMessage(addon_prefix, "Test Message", "WHISPER", (UnitName("player"))) --Testing
 
     addon.conflicts_active[prefix] = setDefaultValues(addon.conflicts_active[prefix])
 
     -- Creation of main window for the discussion
+	-- Activate this when Testing with more than one account
     --conflicts_active[prefix] = addon:createEditionWindow(prefix)
     --conflicts_active[prefix] = addon:createParticipantsWindow(prefix)
   else
@@ -361,59 +356,10 @@ end
 
 
 
-function addon:startConflict ( )
+function addon:startDiscussion ( )
 
   ColLabWoW:RegisterEvent("CHAT_MSG_CHANNEL")
-
-  local prefix = GenerateChannelName(UnitName("player"))
-  local Groupselect = CreateFrame("Frame", "Groupselect"..prefix, UIParent, "BasicFrameTemplate")
-  local group = ""
-  Groupselect:SetWidth(400)
-  Groupselect:SetHeight(400) -- discussionWindow:GetHeight())
-  Groupselect:SetPoint("CENTER" )
-  Groupselect:SetBackdrop({
-    bgFile = "Interface\\ACHIEVEMENTFRAME/UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND.png",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
-    insets = { left = 3, right = 3, top = 5, bottom = 3 }
-  });
-  --Groupselect:SetScript("OnEvent", Participants_OnEvent) -- TODO when someone new connects, add to the list
-  --Groupselect:SetScript("OnUpdate", Participants_Update)
-  Groupselect:SetMovable(true)
-  Groupselect:EnableMouse(true)
-  Groupselect:CreateTitleRegion()
-
-  local raidbutton = CreateFrame("Button", "RaidButton", Groupselect, "UIPanelButtonTemplate")
-  raidbutton:SetSize(100 ,50) -- width, height
-  raidbutton:SetText("Raid")
-  raidbutton:SetPoint("CENTER")
-  raidbutton:SetScript("OnClick", function()
-    group = "RAID"
-    Groupselect:Hide()
-    continue(prefix, group)
-  end)
-
-  local partybutton = CreateFrame("Button", "PartyButton", Groupselect, "UIPanelButtonTemplate")
-  partybutton:SetSize(100 ,50) -- width, height
-  partybutton:SetText("Party")
-  partybutton:SetPoint("BOTTOM", raidbutton, "TOP", 0, 0)
-  partybutton:SetScript("OnClick", function()
-    group = "PARTY"
-    Groupselect:Hide()
-    continue(prefix, group)
-  end)
-
-  local guildbutton = CreateFrame("Button", "GuildButton", Groupselect, "UIPanelButtonTemplate")
-  guildbutton:SetSize(100 ,50) -- width, height
-  guildbutton:SetText("Guild")
-  guildbutton:SetPoint("TOP", raidbutton, "BOTTOM", 0, 0)
-  guildbutton:SetScript("OnClick", function()
-    group = "GUILD"
-    Groupselect:Hide()
-    continue(prefix, group)
-  end)
-
-
+  addon:createDiscussionWindow()
 end
 
 

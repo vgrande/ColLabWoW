@@ -16,7 +16,9 @@ local max_Y = 400 --values for width and height of QFrame.
 local question = { --a table to hold the question/answer format
             prompt = nil,
             firstSelection = true,
-            buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,questionIterator = nil, },
+            --buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,questionIterator = nil, },
+            buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,},
+            questionIterator = nil,
             bText = {1,2,3,4,5,},
             buttonLogic = {
             [1] = false,
@@ -51,13 +53,15 @@ function initQuestionnaire()
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 function RadioButton_OnClick(self)
-    QI=self.questionIterator
-    print ("QI = " .. QI)
-
+    --QI=self.questionIterator
+	local name, questionNumber, buttonNumber = self:GetName():match("(.+)(%d),(%d)")
+    QI=questions[tonumber(questionNumber)].questionIterator
 
     buttonIterator = nil
+    questions[QI].buttonLogic[tonumber(buttonNumber)]=true
     if not questions[QI].firstSelection then
         for i=1, 5 do
+			print(questions[QI].buttonLogic[i])
             if (questions[QI].buttonLogic[i]) then -- since buttonLogic stores our old button, we need to get that iterator so we
             -- can set the old button to unselected and then select the new button stored in returnTable or "table"
 
@@ -65,7 +69,7 @@ function RadioButton_OnClick(self)
             --unchecking of every button, we need to manually store a button once we have handl ed it in our system
                 print(questions[QI].buttonSet[i]:GetName())
                 questions[QI].buttonSet[i]:SetChecked(false)
-                print (i)
+                print (" Button ".. i .. "was checked and now it should not")
                 questions[QI].buttonLogic[i] = false
                 break
             end
@@ -73,7 +77,7 @@ function RadioButton_OnClick(self)
 
     else
         questions[QI].firstSelection=false
-        questions[QI].buttonLogic[self.bNumber]=true
+        questions[QI].buttonLogic[tonumber(buttonNumber)]=true
     end
 
 end
@@ -113,7 +117,7 @@ function getLikertString(selection)
 end
 function updateQuestions()
     for i=nextQuestion,#questions do
-        print (i.."    :    " .. questions[i].prompt)
+--        print (i.."    :    " .. questions[i].prompt)
         qText[i-5]:SetText(questions[i].prompt)
     end
 end
@@ -159,7 +163,9 @@ function addon:showQuestionnaire()
 		        nextPageExists=false
 		    end
 
-	for i=1, #questions do
+	for i=1, #questions do --TODO restore original loop, delete the one for
+	-- debugging
+	--for i=1, 3 do
 	    changeY= -(i*60)
 	    if (changeY< -359) then --if we've run out of space in our current frame
 	        print ("out of space!!")
@@ -174,22 +180,29 @@ function addon:showQuestionnaire()
 
 	    changeX=-200 --reset value of changeX for the next iteration of the following loop
 	    --if not buttonsCreated then
-	        for a=1, 5   do --5 buttons per question
+	        for a=1, 3   do --5 buttons per question
 	            --VIRGINIA: this is the debug printout I showed you in the email.
 	            --This section creates a new set of buttons for every value in the "questions" array, but for some reason
 	            --it seems to vertically override the old buttons.
 	            --Happy hunting :\
-	            print (questions[i].buttonSet[a])
-	            questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
-	            print (questions[i].buttonSet[a])
+	            --questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
+	            questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton"..i..","..a, QFrame, "UIRadioButtonTemplate")
+	            print ("And now new address ")
+				print(questions[i].buttonSet[a])
+				for b=1, 5 do --TODO Delete loop, just for debugging
+	              print ("At a = ".. a .."Button ".. b .. " with address ")
+				  print(questions[i].buttonSet[b])
+			    end
 	            print ("------------------")
-	            questions[i].buttonSet[a].questionIterator = i
+	            --questions[i].buttonSet[a].questionIterator = i
+	            questions[i].questionIterator = i
 	            questions[i].buttonSet[a]:SetHeight(20)
 	            questions[i].buttonSet[a]:SetWidth(20)
 	            questions[i].buttonSet[a]:ClearAllPoints()
 	            questions[i].buttonSet[a]:SetPoint("TOP", changeX, changeY-12)
 	            questions[i].buttonSet[a]:RegisterForClicks("LeftButtonUp")
-	            questions[i].buttonSet[a].bNumber = a
+	            --questions[i].buttonSet[a].bNumber = a
+	            --questions[i].buttonSet.bNumber = a
 	            questions[i].buttonSet[a]:SetScript("OnClick", RadioButton_OnClick)
 
 	            --changeY-12 because we want the buttons towwwwwww be roughly 10 pixels below our question text
@@ -206,8 +219,8 @@ function addon:showQuestionnaire()
 	        end -- end radio-button creation (inner for loop)
 	    --end
 	end -- end text creation(outer for loop)
-	print(questions[1].buttonSet[3] )
-	questions[1].buttonSet[3]:SetChecked(true)
+--	print(questions[1].buttonSet[3] )
+--	questions[1].buttonSet[3]:SetChecked(true)
 	endButton = CreateFrame("Button", "EndButton", QFrame, "GameMenuButtonTemplate")
 	endButton:ClearAllPoints()
 	endButton:SetPoint("BOTTOM", 0, 10)

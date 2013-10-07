@@ -3,6 +3,7 @@
 ## Notes: Allows in-game collaborative decision making
 # SavedVariablesPerCharacter: BagBuddy_ItemTime
 
+Localization\Localization.enUS.lua
 embeds.xml
 ConflictsManagement.lua
 Questionnaire.lua

@@ -16,14 +16,199 @@
 
 
 -- To be able to use several files. This way functions can be stored in the table "addon"
--- and accessed from any file, as this table will be the same for every single file in 
+-- and accessed from any file, as this table will be the same for every single file in
 -- the same addon
 local addonName, addon = ...
 
-local discussion_width = 1000 
-local discussion_height = 600 
+local L = ColLabWoWLocalization
+
+local discussion_width = 1000
+local discussion_height = 600
+
+local background = "Interface\\ACHIEVEMENTFRAME\\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND.png"
+--local background = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated"
+--local background = "Interface\\TutorialFrame\\TutorialFrameBackground"
+local edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border"
+local backdrop =
+{
+    bgFile = background,
+	edgeFile = edge,
+    tile = true, tileSize = 16, edgeSize = 16,
+    insets = { left = 3, right = 3, top = 5, bottom = 3 }
+}
+
+local questionFont = "GameFontNormal"
+local warningFont = "GameFontRed"
+
+------------------------------------------------------------------------------------------
+------------------------------------ Dropdown menu ---------------------------------------
+------------------------------------------------------------------------------------------
+
+-- Based on snippet from wowprogramming:
+-- http://wowprogramming.com/snippets/Create_UI-styled_dropdown_menu_10
+function setDropdownMenu(menu, items, text)
+  local function OnClick(self)
+    UIDropDownMenu_SetSelectedID(menu, self:GetID())
+  end
+
+  local function initialize(self, level)
+    local info = UIDropDownMenu_CreateInfo()
+    for k,v in pairs(items) do
+      info = UIDropDownMenu_CreateInfo()
+      info.text = v
+      info.value = v
+      info.func = OnClick
+      UIDropDownMenu_AddButton(info, level)
+    end
+  end
 
 
+  UIDropDownMenu_Initialize(menu, initialize)
+  UIDropDownMenu_SetWidth(menu, 120);
+  UIDropDownMenu_SetButtonWidth(menu, 140) -- Clickable area of the items
+  -- UIDropDownMenu_SetSelectedID(menu, 1) -- Item selected by default
+  UIDropDownMenu_SetText(menu, text)
+  UIDropDownMenu_JustifyText(menu, "CENTER")
+end
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+----------------------------------- All windows ------------------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+
+function setWindow(frame, width, height, title)
+
+  frame:SetWidth(width)
+  frame:SetHeight(height)
+  frame:SetPoint("CENTER")
+  -- frame.Bg:SetAlpha(0.5) -- No background
+  -- frame.Bg:Hide()
+  -- If we want background
+  frame:SetBackdrop(backdrop) -- Rock (or selected) background
+  frame:SetBackdropColor(1,1,1,0) -- Keep colors, reduce transparency to 50%
+
+  -- Make the window movable
+  frame:SetScript("OnDragStart",function()  frame:StartMoving(); end)
+  frame:SetScript("OnDragStop", function()  frame:StopMovingOrSizing(); end)
+  frame:RegisterForDrag("LeftButton")
+  frame:SetMovable(true)
+  frame:EnableMouse(true)
+  frame:CreateTitleRegion()
+  frame.TitleText:SetText(title)
+
+end
+
+
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+------------------------------- Discussion creation window -------------------------------
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+
+function addon:createDiscussionWindow()
+  local prefix = GenerateChannelName(UnitName("player"))
+  local DiscussionCreation = CreateFrame("Frame", "ConflictCreation"..prefix, UIParent, "BasicFrameTemplate")
+  local group = ""
+  setWindow (DiscussionCreation, 400, 400, "Start a discussion" )
+
+  -- Group selection drop down menu and its text
+
+  local textGroup = DiscussionCreation:CreateFontString(textGroupname, ARTWORK, questionFont)
+  textGroup:SetPoint("TOP", DiscussionCreation, "TOP", 0, -80)
+  textGroup:SetText(L.SCOPE)
+
+  CreateFrame("Button", "GroupSelectionMenu", DiscussionCreation, "UIDropDownMenuTemplate")
+
+  GroupSelectionMenu:ClearAllPoints()
+  GroupSelectionMenu:SetPoint("TOP", textGroup, "BOTTOM", 0, -10)
+  GroupSelectionMenu:Show()
+
+  local groups = {
+   "      Party         ",
+   "      Raid          ",
+   "      Guild         ",
+  }
+
+  setDropdownMenu(GroupSelectionMenu, groups, "-- ".. L.SELECT_GROUP .. "--")
+
+
+  -- Kind of discussion drop down menu and its text
+
+  local textKind = DiscussionCreation:CreateFontString(textKindname, ARTWORK, questionFont)
+  textKind:SetPoint("TOP", GroupSelectionMenu, "BOTTOM", 0, -30)
+  textKind:SetText(L.KIND)
+
+  CreateFrame("Button", "DiscussionKindMenu", DiscussionCreation, "UIDropDownMenuTemplate")
+
+  DiscussionKindMenu:ClearAllPoints()
+  DiscussionKindMenu:SetPoint("TOP", textKind, "BOTTOM", 0, -10)
+  DiscussionKindMenu:Show()
+
+  local kinds = {
+   "Ban player",
+   "Distribute loot",
+   "Raiding calendar",
+  }
+
+  setDropdownMenu(DiscussionKindMenu, kinds, "-- ".. L.SELECT_KIND .. "--")
+
+  DiscussionKindMenu:ClearAllPoints()
+  DiscussionKindMenu:SetPoint("TOP", textKind, "BOTTOM", 0, -10)
+  DiscussionKindMenu:Show()
+
+  -- Template usage buttons and question text
+
+  local textTemplate = DiscussionCreation:CreateFontString(textTemplatename, ARTWORK, questionFont)
+  textTemplate:SetPoint("TOP", DiscussionKindMenu, "BOTTOM", 0, -20)
+  textTemplate:SetText(L.TEMPLATE)
+
+  CreateFrame("CheckButton", "YesButton", DiscussionCreation, "UIRadioButtonTemplate")
+  CreateFrame("CheckButton", "NoButton", DiscussionCreation, "UIRadioButtonTemplate")
+  YesButton:SetSize(20 ,20) -- width, height
+  _G[YesButton:GetName().."Text"]:SetText(L.YES)
+  YesButton:SetPoint("TOP", textTemplate, "BOTTOM", -40, -10)
+  NoButton:SetSize(20 ,20) -- width, height
+  NoButton:SetPoint("LEFT", YesButton, "RIGHT", 40, 0)
+  _G[NoButton:GetName().."Text"]:SetText(L.NO)
+
+
+  -- Submit button, proceed to first stage of the discussion
+  local createButton = CreateFrame("Button", "CreateButton", DiscussionCreation, "UIPanelButtonTemplate")
+  createButton:SetSize(150 ,70) -- width, height
+  createButton:SetText("Create discussion")
+  createButton:SetPoint("BOTTOM", DiscussionCreation, "BOTTOM", 0, 20)
+  createButton:SetScript("OnClick", function()
+    local selectedGroup = UIDropDownMenu_GetSelectedID(GroupSelectionMenu)
+    local selectedKind = UIDropDownMenu_GetSelectedID(DiscussionKindMenu)
+	print (selectedGroup)
+	if (selectedGroup == nil) then
+  	  local textNoGroup = DiscussionCreation:CreateFontString(textNoGroupname, ARTWORK, warningFont)
+      textNoGroup:SetPoint("BOTTOM", textGroup, "TOP", 0, 10)
+      textNoGroup:SetText(L.NOGROUP)
+    else
+	  if (textNoGroup) then
+	    textNoGroup:Hide()
+	  end
+    end
+	if (selectedKind == nil) then
+  	  local textNoKind = DiscussionCreation:CreateFontString(textNoKindname, ARTWORK, warningFont)
+      textNoKind:SetPoint("BOTTOM", textKind, "TOP", 0, 10)
+      textNoKind:SetText(L.NOKIND)
+	else
+	  if (textNoKind) then
+	    textNoKind:Hide()
+	  end
+  end
+	if (selectedGroup ~= nil and selectedKind ~= nil) then
+  	  local group = string.upper(groups[selectedGroup])
+      DiscussionCreation:Hide()
+   	  continueCreateDiscussion(prefix, group)
+    end
+  end)
+
+end
 
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
@@ -39,17 +224,10 @@ function addon:createParticipantsWindow( prefix)
 
   local conflict = addon.conflicts_active_testing[prefix]
   local discussionWindow = conflict.conflict_ui.editwindow
- 
+
   local Participantswindow = CreateFrame("Frame", "Participants" .. prefix, discussionWindow, "BasicFrameTemplate")
-  Participantswindow:SetWidth(184)
-  Participantswindow:SetHeight(discussion_height) -- discussionWindow:GetHeight())
+  setWindow(Participantswindow, 184, discussion_height)
   Participantswindow:SetPoint("TOPLEFT", discussionWindow, "TOPRIGHT" )
-  Participantswindow:SetBackdrop({
-    --bgFile = "Interface\\ACHIEVEMENTFRAME/UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND.png",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
-    insets = { left = 3, right = 3, top = 5, bottom = 3 }
-  });
   Participantswindow:SetScript("OnEvent", Participants_OnEvent) -- TODO when someone new connects, add to the list
   Participantswindow:SetScript("OnUpdate", Participants_Update)
   Participantswindow:SetMovable(true)
@@ -67,14 +245,15 @@ function addon:createParticipantsWindow( prefix)
 
   -- Displays list of participants as individual no editable text boxes
   conflict.conflict_ui.participants_boxes = {}
-  local counter = 1
+  local firstParticipant = true
   for player_name, join in pairs(conflict.participants) do
     local player = CreateFrame("EditBox", "Participant".. tostring(counter) , Participantswindow, "InputBoxTemplate")
     player:SetHeight(85)
     player:SetWidth(175) -- participants width - 9
     table.insert(conflict.conflict_ui.participants_boxes, player)
-    if (counter == 1) then
+    if (firstParticipant) then
       player:SetPoint("LEFT", Participantswindow, "TOPLEFT", 7, -50)
+	  firstParticipant = false
     else
       player:SetPoint("TOP", conflict.conflict_ui.participants_boxes[counter-1], "BOTTOM")
     end
@@ -82,7 +261,6 @@ function addon:createParticipantsWindow( prefix)
     player:SetMaxLetters(255)
     player:SetTextInsets(5, 5, 2, 2)
     player:Disable() -- No editable
-    counter = counter + 1
   end
   return conflict
 end
@@ -148,11 +326,11 @@ function createEditBoxes( prefix)
     local option = CreateFrame ("EditBox", ("opt%d:%s"): format(option_number, prefix), discussion.scrollframe.content, "InputBoxTemplate")
     option:SetHeight(15)
     option:SetWidth(200)
-    option_boxes[option_number] = option 
+    option_boxes[option_number] = option
     if (option_number == 1) then
       option:SetPoint("LEFT", discussion.scrollframe.content, "TOPLEFT", 135*2,-40)--discussion.header:GetHeight()+20) -- 175 to leave space horizontally for the stakeholders column
     else
-      option:SetPoint("LEFT", option_boxes[option_number-1], "RIGHT", 15, 0)    
+      option:SetPoint("LEFT", option_boxes[option_number-1], "RIGHT", 15, 0)
     end
 
     option:SetText(conflict.conflict_data["options"][option_number])
@@ -171,7 +349,7 @@ function createEditBoxes( prefix)
       local posneg = CreateFrame("EditBox", ("pos_neg%d:%s"):format(posneg_index, prefix), discussion.scrollframe.content, "InputBoxTemplate")
       posneg:SetHeight(15)
       posneg:SetWidth((option:GetWidth())/2)
-      
+
       if (counter == 1) then
         posneg:SetPoint("TOPLEFT", option, "BOTTOMLEFT")
         posneg:SetPoint("TOPRIGHT", option, "BOTTOM")
@@ -194,17 +372,17 @@ function createEditBoxes( prefix)
   local stakeholder_boxes = {}
   local interests_boxes = {}
   local consequences_boxes = {}
- 
+
   for stakeholder_number=1, #(conflict.conflict_data["stakeholders_names"]) do
     local stakeholder = CreateFrame ("EditBox", ("sta%d:%s"):format(stakeholder_number, prefix), discussion.scrollframe.content, "InputBoxTemplate")
     stakeholder:SetWidth(135)
     -- Height of this box depends on how many interests that stakeholder has
     stakeholder:SetHeight(140) --TODO (*#(conflict.conflict_data["stakeholders_interests_names"][stakeholder_number])))
-    stakeholder_boxes[stakeholder_number] = stakeholder 
+    stakeholder_boxes[stakeholder_number] = stakeholder
     if (stakeholder_number == 1) then
       stakeholder:SetPoint("TOPRIGHT", option_boxes[1], "LEFT", -135, 0) -- --175 to leave room for the interests column
     else
-      stakeholder:SetPoint("TOP", stakeholder_boxes[stakeholder_number-1], "BOTTOM", 0, 0)    
+      stakeholder:SetPoint("TOP", stakeholder_boxes[stakeholder_number-1], "BOTTOM", 0, 0)
     end
 
     stakeholder:SetText(conflict.conflict_data["stakeholders_names"][stakeholder_number])
@@ -224,7 +402,7 @@ function createEditBoxes( prefix)
       if (interest_number == 1) then
         interestbox:SetPoint("LEFT", stakeholder, "RIGHT", 0, 0)
       else
-        interestbox:SetPoint("TOP", interests_boxes[stakeholder_number][interest_number-1], "BOTTOM", 0, -30)    
+        interestbox:SetPoint("TOP", interests_boxes[stakeholder_number][interest_number-1], "BOTTOM", 0, -30)
       end
       interestbox:SetText(conflict.conflict_data["stakeholders_interests_names"][stakeholder_number][interest_number])
       interestbox:SetTextInsets(5, 5, 2, 2)
@@ -242,7 +420,7 @@ function createEditBoxes( prefix)
           local consequencebox = CreateFrame ("EditBox", ("con%d,%d,%d,%d:%s"):format(consequence_number, posneg_number, interest_number, stakeholder_number, prefix), discussion.scrollframe.content, "InputBoxTemplate")
           consequencebox:SetHeight(25)
           consequencebox:SetWidth(200/2)
-          consequences_boxes[stakeholder_number][interest_number][posneg_number][consequence_number] = consequencebox 
+          consequences_boxes[stakeholder_number][interest_number][posneg_number][consequence_number] = consequencebox
           if (consequence_number == 1) then
             local distance = 15 + (posneg_number-1) * consequencebox:GetWidth() -- See how many columns wide distance to skip
             if (consequence_number % 2 == 0) then
@@ -251,7 +429,7 @@ function createEditBoxes( prefix)
               consequencebox:SetPoint("LEFT", interestbox, "RIGHT", distance, 0)
             end
           else
-            consequencebox:SetPoint("TOP", consequences_boxes[stakeholder_number][interest_number][posneg_number][consequence_number-1], "BOTTOM", 0, 0) 
+            consequencebox:SetPoint("TOP", consequences_boxes[stakeholder_number][interest_number][posneg_number][consequence_number-1], "BOTTOM", 0, 0)
           end
           consequencebox:SetText(consequence_value)
           consequencebox:SetMultiLine(true)
@@ -261,7 +439,7 @@ function createEditBoxes( prefix)
         end
       end
     end
-  
+
   end -- Create stakeholder boxes
   conflict.conflict_ui["stakeholders"] = stakeholder_boxes
   conflict.conflict_ui["interests"] = interests_boxes
@@ -273,63 +451,48 @@ end
 
 
 
-
-
-
 function addon:createEditionWindow(prefix)
 
 -- Code for scroll window adapted from http://us.battle.net/wow/en/forum/topic/1305771013
-  -- Parent frame 
+  -- Parent frame
   local discussion = CreateFrame("Frame", "Discussion" .. prefix, UIParent, "BasicFrameTemplate")
-  discussion:SetSize(discussion_width, discussion_height) 
-  discussion:SetPoint("CENTER") 
-  discussion:SetBackdrop({
-    --bgFile = "Interface\\ACHIEVEMENTFRAME/UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND.png",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile = true, tileSize = 16, edgeSize = 16,
-    insets = { left = 3, right = 3, top = 5, bottom = 3 }
-  })
-  discussion:SetScript("OnDragStart",function()  discussion:StartMoving(); end)
-  discussion:SetScript("OnDragStop", function()  discussion:StopMovingOrSizing(); end)
-  discussion:RegisterForDrag("LeftButton")
-  discussion:SetMovable(true)
-  discussion:EnableMouse(true)
-  discussion:CreateTitleRegion()
+  setWindow(discussion, discussion_width, discussion_height, (addon.conflicts_active_testing[prefix].conflict_data["description"]))
+
 
   -- Title bar (conflict description)
-  discussion.header = CreateFrame("EditBox", ("tit:%s"):format(prefix), discussion, "InputBoxTemplate")
-  discussion.header:SetSize(discussion:GetWidth()-50, 44)
-  discussion.header:SetPoint("CENTER", discussion, "TOP", 55, -10)
-  discussion.header:SetText(addon.conflicts_active_testing[prefix].conflict_data["description"])
-  discussion.header:SetAutoFocus(false)
-  discussion.header:SetScript("OnEnterPressed", editBox_OnEnterPressed)
+--  discussion.header = CreateFrame("EditBox", ("tit:%s"):format(prefix), discussion, "InputBoxTemplate")
+--  discussion.header:SetSize(discussion:GetWidth()-50, 44)
+--  discussion.header:SetPoint("CENTER", title, "CENTER",0, 0)
+--  discussion.header:SetText(addon.conflicts_active_testing[prefix].conflict_data["description"])
+--  discussion.header:SetAutoFocus(false)
+ -- discussion.header:SetScript("OnEnterPressed", editBox_OnEnterPressed)
 
 
-  --Scrollframe 
-  local scrollframe = CreateFrame("ScrollFrame", nil, discussion) 
-  scrollframe:SetPoint("TOPLEFT", 10, -10) 
-  scrollframe:SetPoint("BOTTOMRIGHT", -10, 10) 
-  discussion.scrollframe = scrollframe 
+  --Scrollframe
+  local scrollframe = CreateFrame("ScrollFrame", nil, discussion)
+  scrollframe:SetPoint("TOPLEFT", 10, -10)
+  scrollframe:SetPoint("BOTTOMRIGHT", -10, 10)
+  discussion.scrollframe = scrollframe
 
-  -- Scrollbar 
-  local scrollbar = CreateFrame("Slider", nil, scrollframe, "UIPanelScrollBarTemplate") 
-  scrollbar:SetPoint("TOPLEFT", discussion, "TOPRIGHT", -20, -37) 
-  scrollbar:SetPoint("BOTTOMLEFT", discussion, "BOTTOMRIGHT", 4, 16) 
-  scrollbar:SetMinMaxValues(1, 100) 
-  scrollbar:SetValueStep(6) 
-  scrollbar.scrollStep = 1 
-  scrollbar:SetValue(0) 
-  scrollbar:SetWidth(16) 
-  scrollbar:SetScript("OnValueChanged", function (discussion, value) discussion:GetParent():SetVerticalScroll(value) end) 
-  local scrollbg = scrollbar:CreateTexture(nil, "BACKGROUND") 
-  scrollbg:SetAllPoints(scrollbar) 
-  scrollbg:SetTexture(0, 0, 0, 0.4) 
-  discussion.scrollbar = scrollbar 
+  -- Scrollbar
+  local scrollbar = CreateFrame("Slider", nil, scrollframe, "UIPanelScrollBarTemplate")
+  scrollbar:SetPoint("TOPLEFT", discussion, "TOPRIGHT", -20, -37)
+  scrollbar:SetPoint("BOTTOMLEFT", discussion, "BOTTOMRIGHT", 4, 16)
+  scrollbar:SetMinMaxValues(1, 100)
+  scrollbar:SetValueStep(6)
+  scrollbar.scrollStep = 1
+  scrollbar:SetValue(0)
+  scrollbar:SetWidth(16)
+  scrollbar:SetScript("OnValueChanged", function (discussion, value) discussion:GetParent():SetVerticalScroll(value) end)
+  local scrollbg = scrollbar:CreateTexture(nil, "BACKGROUND")
+  scrollbg:SetAllPoints(scrollbar)
+  scrollbg:SetTexture(0, 0, 0, 0.4)
+  discussion.scrollbar = scrollbar
 
-  -- Content frame 
-  local discussionContent = CreateFrame("Frame", "discussionContent of" .. prefix, scrollframe) 
-  discussionContent:SetSize(discussion_width, discussion_height) 
-  scrollframe.content = discussionContent 
+  -- Content frame
+  local discussionContent = CreateFrame("Frame", "discussionContent of" .. prefix, scrollframe)
+  discussionContent:SetSize(discussion_width, discussion_height)
+  scrollframe.content = discussionContent
   scrollframe:SetScrollChild(discussionContent)
 
 --[[
@@ -418,7 +581,7 @@ function votingbutton_OnClick( button )
     --button:SetNormalTexture("Interface\\SPELLBOOK\\UI-SpellbookPanel-Tab-Highlight")
     button.active = true
   end
-  
+
 end
 
 
@@ -435,11 +598,11 @@ function createVotingButtons( prefix )
     local option = CreateFrame ("EditBox", ("opt%d:%s"): format(option_number, prefix), discussion.scrollframe.content, "InputBoxTemplate")
     option:SetHeight(15)
     option:SetWidth(200)
-    option_boxes[option_number] = option 
+    option_boxes[option_number] = option
     if (option_number == 1) then
       option:SetPoint("LEFT", discussion.scrollframe.content, "TOPLEFT", 135*2,-40)--discussion.header:GetHeight()+20) -- 175 to leave space horizontally for the stakeholders column
     else
-      option:SetPoint("LEFT", option_boxes[option_number-1], "RIGHT", 15, 0)    
+      option:SetPoint("LEFT", option_boxes[option_number-1], "RIGHT", 15, 0)
     end
 
     option:SetText(conflict.conflict_data["options"][option_number])
