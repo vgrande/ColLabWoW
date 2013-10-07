@@ -360,6 +360,7 @@ function addon:startDiscussion ( )
 
   ColLabWoW:RegisterEvent("CHAT_MSG_CHANNEL")
   addon:createDiscussionWindow()
+  addon:joinDiscussionWindow()
 end
 
 

@@ -20,6 +20,9 @@
 -- the same addon
 local addonName, addon = ...
 
+addon.DiscussionCreation = nil -- Window to create a Discussion
+addon.joinDiscussionsWindow = nil -- Window to join a Discussion
+
 local L = ColLabWoWLocalization
 
 local discussion_width = 1000
@@ -40,8 +43,11 @@ local backdrop =
 local questionFont = "GameFontNormal"
 local warningFont = "GameFontRed"
 
+
+------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 ------------------------------------ Dropdown menu ---------------------------------------
+------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
 -- Based on snippet from wowprogramming:
@@ -70,6 +76,9 @@ function setDropdownMenu(menu, items, text)
   UIDropDownMenu_SetText(menu, text)
   UIDropDownMenu_JustifyText(menu, "CENTER")
 end
+
+
+
 
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
@@ -107,28 +116,34 @@ end
 ------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------
 
+function addon:joinDiscussionWindow()
+  addon.joinDiscussionsWindow = CreateFrame("Frame", "JoinDiscussionWindow", addon.DiscussionCreation, "BasicFrameTemplate")
+  setWindow (addon.joinDiscussionsWindow, 200, 400, "Join a discussion" )
+  addon.joinDiscussionsWindow:SetPoint("TOPRIGHT", addon.DiscussionCreation, "TOPLEFT" )
+end
+
 function addon:createDiscussionWindow()
   local prefix = GenerateChannelName(UnitName("player"))
-  local DiscussionCreation = CreateFrame("Frame", "ConflictCreation"..prefix, UIParent, "BasicFrameTemplate")
+  addon.DiscussionCreation = CreateFrame("Frame", "ConflictCreation"..prefix, UIParent, "BasicFrameTemplate")
   local group = ""
-  setWindow (DiscussionCreation, 400, 400, "Start a discussion" )
+  setWindow (addon.DiscussionCreation, 400, 400, "Start a discussion" )
 
   -- Group selection drop down menu and its text
 
-  local textGroup = DiscussionCreation:CreateFontString(textGroupname, ARTWORK, questionFont)
-  textGroup:SetPoint("TOP", DiscussionCreation, "TOP", 0, -80)
+  local textGroup = addon.DiscussionCreation:CreateFontString(textGroupname, ARTWORK, questionFont)
+  textGroup:SetPoint("TOP", addon.DiscussionCreation, "TOP", 0, -80)
   textGroup:SetText(L.SCOPE)
 
-  CreateFrame("Button", "GroupSelectionMenu", DiscussionCreation, "UIDropDownMenuTemplate")
+  CreateFrame("Button", "GroupSelectionMenu", addon.DiscussionCreation, "UIDropDownMenuTemplate")
 
   GroupSelectionMenu:ClearAllPoints()
   GroupSelectionMenu:SetPoint("TOP", textGroup, "BOTTOM", 0, -10)
   GroupSelectionMenu:Show()
 
   local groups = {
-   "      Party         ",
-   "      Raid          ",
-   "      Guild         ",
+	  "      Party         ",
+	  "      Raid          ",
+	  "      Guild         ",
   }
 
   setDropdownMenu(GroupSelectionMenu, groups, "-- ".. L.SELECT_GROUP .. "--")
@@ -136,11 +151,11 @@ function addon:createDiscussionWindow()
 
   -- Kind of discussion drop down menu and its text
 
-  local textKind = DiscussionCreation:CreateFontString(textKindname, ARTWORK, questionFont)
+  local textKind = addon.DiscussionCreation:CreateFontString(textKindname, ARTWORK, questionFont)
   textKind:SetPoint("TOP", GroupSelectionMenu, "BOTTOM", 0, -30)
   textKind:SetText(L.KIND)
 
-  CreateFrame("Button", "DiscussionKindMenu", DiscussionCreation, "UIDropDownMenuTemplate")
+  CreateFrame("Button", "DiscussionKindMenu", addon.DiscussionCreation, "UIDropDownMenuTemplate")
 
   DiscussionKindMenu:ClearAllPoints()
   DiscussionKindMenu:SetPoint("TOP", textKind, "BOTTOM", 0, -10)
@@ -160,12 +175,12 @@ function addon:createDiscussionWindow()
 
   -- Template usage buttons and question text
 
-  local textTemplate = DiscussionCreation:CreateFontString(textTemplatename, ARTWORK, questionFont)
+  local textTemplate = addon.DiscussionCreation:CreateFontString(textTemplatename, ARTWORK, questionFont)
   textTemplate:SetPoint("TOP", DiscussionKindMenu, "BOTTOM", 0, -20)
   textTemplate:SetText(L.TEMPLATE)
 
-  CreateFrame("CheckButton", "YesButton", DiscussionCreation, "UIRadioButtonTemplate")
-  CreateFrame("CheckButton", "NoButton", DiscussionCreation, "UIRadioButtonTemplate")
+  CreateFrame("CheckButton", "YesButton", addon.DiscussionCreation, "UIRadioButtonTemplate")
+  CreateFrame("CheckButton", "NoButton", addon.DiscussionCreation, "UIRadioButtonTemplate")
   YesButton:SetSize(20 ,20) -- width, height
   _G[YesButton:GetName().."Text"]:SetText(L.YES)
   YesButton:SetPoint("TOP", textTemplate, "BOTTOM", -40, -10)
@@ -175,10 +190,10 @@ function addon:createDiscussionWindow()
 
 
   -- Submit button, proceed to first stage of the discussion
-  local createButton = CreateFrame("Button", "CreateButton", DiscussionCreation, "UIPanelButtonTemplate")
+  local createButton = CreateFrame("Button", "CreateButton", addon.DiscussionCreation, "UIPanelButtonTemplate")
   createButton:SetSize(150 ,70) -- width, height
   createButton:SetText("Create discussion")
-  createButton:SetPoint("BOTTOM", DiscussionCreation, "BOTTOM", 0, 20)
+  createButton:SetPoint("BOTTOM", addon.DiscussionCreation, "BOTTOM", 0, 20)
   createButton:SetScript("OnClick", function()
     local selectedGroup = UIDropDownMenu_GetSelectedID(GroupSelectionMenu)
     local selectedKind = UIDropDownMenu_GetSelectedID(DiscussionKindMenu)
@@ -193,7 +208,7 @@ function addon:createDiscussionWindow()
 	  end
     end
 	if (selectedKind == nil) then
-  	  local textNoKind = DiscussionCreation:CreateFontString(textNoKindname, ARTWORK, warningFont)
+  	  local textNoKind = addon.DiscussionCreation:CreateFontString(textNoKindname, ARTWORK, warningFont)
       textNoKind:SetPoint("BOTTOM", textKind, "TOP", 0, 10)
       textNoKind:SetText(L.NOKIND)
 	else
@@ -203,7 +218,7 @@ function addon:createDiscussionWindow()
   end
 	if (selectedGroup ~= nil and selectedKind ~= nil) then
   	  local group = string.upper(groups[selectedGroup])
-      DiscussionCreation:Hide()
+      addon.DiscussionCreation:Hide()
    	  continueCreateDiscussion(prefix, group)
     end
   end)

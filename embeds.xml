@@ -3,4 +3,6 @@
   <Include file="Libs\AceGUI-3.0"/>
   <Include file="Libs\LibSpreadsheet-1.0\LibSpreadsheet-1.0.lua"/>
   <Include file="Libs\LibSyncTime-1.0\LibSyncTime-1.0\LibSyncTime-1.0.lua"/>
+  <Include file = "Libs\LibStub\Libstub.lua" />
+  <Include file = "Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua" />
 </Ui>

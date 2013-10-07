@@ -92,6 +92,27 @@ ColLabWoW:SetScript("OnEvent", ColLabWoW_OnEvent)
 ColLabWoW:SetScript("OnUpdate", ColLabWoW_Update)
 ColLabWoW:RegisterEvent("CHAT_MSG_WHISPER") -- Testing, should be changed to PARTY, etc. (or not? What happens with invitations?)
 
+------------------------------------------------------------------------------------------
+--------------------------------- Icon at minimap ----------------------------------------
+------------------------------------------------------------------------------------------
+
+local minimapButton = CreateFrame("Button", "MinimapButton", UIParent, "UIPanelButtonTemplate")
+minimapButton:ClearAllPoints()
+minimapButton:SetPoint("RIGHT", Minimap, "TOPLEFT", 20, -15)
+_G[minimapButton:GetName().."Text"]:SetText("CLW")
+minimapButton:Show()
+minimapButton:SetScript("OnClick",function()
+               if (not addon.DiscussionCreation) then
+                  addon:startDiscussion()
+               else
+                 if (not addon.DiscussionCreation:IsShown()) then
+                  addon.DiscussionCreation:Show()
+                 end
+                 if (not addon.joinDiscussionsWindow:IsShown()) then
+                  addon.joinDiscussionsWindow:Show()
+                 end
+			   end
+ 			 end)
 
 
 
@@ -140,19 +161,6 @@ SlashCmdList["PARTICIPANTS"] = function ()
 end
 
 
--- Old command to create private channel
---[[
-  if (chosen_name == "") then
-    print ("You need to provide a name for the channel. Type /clw <name> to join your
-     group's channel")
-  else
-    channel_type, channel_name = JoinChannelByName(chosen_name, "secretPassword")
-    , ChatFrame1:GetID(), 1);
-    print (string.format("Joined channel %s for decision making", channel_name))
-    sendChatMessage ("testiiiing", "WHISPER", "Common", "Axelsonn")
---]]
-
-
 
 
 
@@ -168,14 +176,14 @@ end
 ColLabEventChat_Msg_Addon = function (frame, event, ... )
   local prefix_received, message, channel, sender = ...
     -- Check if there is an active conflict with that prefix. Otherwise, ignore
-    for prefix, _ in pairs(addon.conflicts_active) do 
+    for prefix, _ in pairs(addon.conflicts_active) do
       if (prefix_received == prefix) then
         -- print ("Message caught = ".. message)
         local master = addon.conflicts_active[prefix].master
        -- print ("Message is " .. message)
         if (message == "Test Message") then
           print ("Test message received")
-        
+
         elseif (message == "Wrong master") then
           print ("Error: Wrong master")
 

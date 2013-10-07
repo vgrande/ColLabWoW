@@ -1,10 +1,10 @@
 ## Interface: 50300
 ## Title: ColLabWoW
 ## Notes: Allows in-game collaborative decision making
-# SavedVariablesPerCharacter: BagBuddy_ItemTime
+# SavedVariables: addon.DiscussionCreation
 
-Localization\Localization.enUS.lua
 embeds.xml
+Localization\Localization.enUS.lua
 ConflictsManagement.lua
 Questionnaire.lua
 ColLabWoW.lua
