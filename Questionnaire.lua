@@ -10,15 +10,37 @@
 -- and accessed from any file, as this table will be the same for every single file in
 -- the same addon
 local addonName, addon = ...
-local fuckme = true
 local max_X = 600
 local max_Y = 400 --values for width and height of QFrame.
-local question = { --a table to hold the question/answer format
-            prompt = nil,
+
+    local questions =
+    {} -- an ARRAY holding each question  and its data
+local qText = {}
+local questionnaire_title = nil
+local nextPageExists = false
+local nextQuestion = 1
+local currentPage = 1
+local data = ""
+local numPagesLeft = 0
+local NUM_QUESTIONS = 0
+local QPP = 0 --questions per page
+------------------------------------------------------------------------------------------------------------------------------------
+function initQuestionnaire(Qtitle)
+    local rTable = addon:getQTable(Qtitle)
+	NUM_QUESTIONS = addon:getQTable(Qtitle).numquestions
+	question_table = addon:getQTable(Qtitle).questionTable
+    if(NUM_QUESTIONS >=5) then
+		QPP = 5
+	else
+		QPP = NUM_QUESTIONS
+	end
+    numPagesLeft = (NUM_QUESTIONS - (NUM_QUESTIONS%5))/5 + 1
+
+    for i = 1, NUM_QUESTIONS do
+       local question = { --a table to hold the question/answer format
+            prompt = question_table[i],
             firstSelection = true,
-            --buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,questionIterator = nil, },
             buttonSet = {[1] = nil, [2]=nil, [3]=nil, [4]=nil, [5]=nil,},
-            questionIterator = nil,
             bText = {1,2,3,4,5,},
             buttonLogic = {
             [1] = false,
@@ -28,56 +50,33 @@ local question = { --a table to hold the question/answer format
             [5] = false,
             } --array of boolean values to store button states
         }
-    local questions =
-    {} -- an ARRAY holding each question  and its data
-local qText = {}
-    local questionnaire_title = nil
-local nextPageExists = false -- false default intended
-local nextQuestion = 1
-
-------------------------------------------------------------------------------------------------------------------------------------
-function initQuestionnaire()
-   local NUM_QUESTIONS = 4
-   local question_table = {
-        "Question 1",
-        "Question 2",
-        "Question 3",
-        "Question 4",
-    }
-   for i = 1, NUM_QUESTIONS do
-   local Q = {} --we do this INSIDE the for loop to reset Q's v  alue and reset the metatable
-    setmetatable(Q, {__index = question}) -- bases table Q off of question table (basically instantiating an object of type question)
-    Q.prompt= question_table[i]
-    table.insert(questions, i,Q) -- inserts a new "question" into our array of "questions"
+      table.insert(questions, i,question) -- inserts a new "question" into our array of "questions"
    end
 end
 -----------------------------------------------------------------------------------------------------------------------------------------
 function RadioButton_OnClick(self)
-    --QI=self.questionIterator
-	local name, questionNumber, buttonNumber = self:GetName():match("(.+)(%d),(%d)")
-    QI=questions[tonumber(questionNumber)].questionIterator
 
+    local name, questionNumber, buttonNumber = self:GetName():match("(.+)(%d),(%d)")
+    questionNumber = tonumber(questionNumber)
+    buttonNumber = tonumber(buttonNumber)
     buttonIterator = nil
-    questions[QI].buttonLogic[tonumber(buttonNumber)]=true
-    if not questions[QI].firstSelection then
+    if not questions[questionNumber].firstSelection then
         for i=1, 5 do
-			print(questions[QI].buttonLogic[i])
-            if (questions[QI].buttonLogic[i]) then -- since buttonLogic stores our old button, we need to get that iterator so we
+            if (questions[questionNumber].buttonLogic[i]) then -- since buttonLogic stores our old button, we need to get that iterator so we
             -- can set the old button to unselected and then select the new button stored in returnTable or "table"
 
             --the reason we don't use getChecked instead of our buttonLogic table is b/c in order to prevent the automatic
             --unchecking of every button, we need to manually store a button once we have handl ed it in our system
-                print(questions[QI].buttonSet[i]:GetName())
-                questions[QI].buttonSet[i]:SetChecked(false)
-                print (" Button ".. i .. "was checked and now it should not")
-                questions[QI].buttonLogic[i] = false
+                questions[questionNumber].buttonSet[i]:SetChecked(false)
+                questions[questionNumber].buttonLogic[i] = false
+                questions[questionNumber].buttonLogic[buttonNumber] = true
                 break
             end
         end
 
     else
-        questions[QI].firstSelection=false
-        questions[QI].buttonLogic[tonumber(buttonNumber)]=true
+        questions[questionNumber].firstSelection=false
+        questions[questionNumber].buttonLogic[buttonNumber]=true
     end
 
 end
@@ -85,19 +84,19 @@ end
 function submit(self)
     self:GetParent():Hide()
     print("Thanks for participating!  Please open your mailbox and ColLab will automatically send your results to a collection point") --TODO: fix wording?
-    local data = "Results: "
-    for i=1, #questions do
-        for a=1, 5 do
-            if(questions[i].buttonSet[a]:GetChecked()) then
-                data = data.."("..i..","..a..")" --TODO:error checker for invalid data (e.g. 2 answers for 1 q)
-            end
-        end
-    end
-    mailEventFrame = CreateFrame("Frame","MailEventFrame",QFrame)
-    mailEventFrame:RegisterForEvent("MAIL_INBOX_UPDATE")
+    mailEventFrame = CreateFrame("Frame","MailEventFrame", QFrame)
+    mailEventFrame:RegisterEvent("MAIL_INBOX_UPDATE")
     mailEventFrame:SetScript("OnEvent", function(self, event, ...)
-        SendMail("QuestionnaireBot","Results", data) --DON'T FORGET TO CHANGE RECIPIENT TO ACTUAL RECIPIENT NAME LOL
-    end)
+        ClearSendMail()
+		if(UnitFactionGroup(UnitName("player")) == "Alliace") then
+		    SendMail("Qbottesta","Results", data)
+		    -- requires that a toon has been created on alliance and horde on each test server.
+			--an alternate solution (if needed) would be to create a table of collection characters.  the key would be the server name, and the returned vaulue would be the character name.
+			--at the time being, it appears i can reserve these names on each server, so this is not needed
+		else
+		    SendMail("Qbottesth","Results", data)
+		end
+        end)
 end
 -----------------------------------------------------------------------------------------------------------------------------------
 function getLikertString(selection)
@@ -116,16 +115,66 @@ function getLikertString(selection)
     end
 end
 function updateQuestions()
-    for i=nextQuestion,#questions do
---        print (i.."    :    " .. questions[i].prompt)
-        qText[i-5]:SetText(questions[i].prompt)
+
+ local answered
+--store current page in "data" variable, clear page
+    for i=(nextQuestion-currentPage*5), (nextQuestion-currentPage*5+4) do --5 because there's only ever 5 questions on the screen @ once
+           answered = false
+           for a=1, 5 do
+            print(i)
+               if(questions[i].buttonSet[a]:GetChecked()) then
+                   data = data.."("..i..","..a..")" --TODO:error checker for invalid data (e.g. 2 answers for 1 q)
+                   answered = true
+
+               end --endif
+           end--end inner for
+
+             --none of the buttons in the question are selected, prompt user to finish
+            if not answered then
+               print("Please finish answering question " .. i .. " before moving on.")
+               return
+           end--endif
+
+    end--end outer for
+    numPagesLeft = numPagesLeft-1
+    for i = 1 , 5 do
+        for a =1 ,5 do
+            questions[i].buttonSet[a]:SetChecked(false)
+        end
+
     end
+ --update question texts
+    local b = 1
+    local partialPageModifier
+    if(numPagesLeft==1) then
+        partialPageModifier = (NUM_QUESTIONS%5)-1
+        endButton:SetText("Submit")
+        endButton:SetScript("OnClick", submit)
+        --hide trailing buttons and questions
+        for i = 5-(1+partialPageModifier), 5 do
+            for a = 1, 5 do
+                questions[i].buttonSet[a]:Hide()
+            end
+            qText[i]:Hide()
+        end
+    else
+        partialPageModifier = 4
+    end
+    print(partialPageModifier .. "ppm")
+    for i=nextQuestion, nextQuestion+partialPageModifier  do
+        print ("b = " .. b)
+        qText[b]:SetText(questions[i].prompt)
+        b = b+1
+    end
+     currentPage = currentPage + 1
+     nextQuestion = nextQuestion+5
 end
-function addon:showQuestionnaire()
+function addon:showQuestionnaire(Qtitle)
+    numPagesLeft = numPagesLeft-1
     local changeY = 0 --zero b/c we need to run comparisons before setting values
     local changeX = nil
     local tempText = nil
-	initQuestionnaire()
+	initQuestionnaire(Qtitle)
 	if(not QFrame) then
 	    local QFrame = CreateFrame("Frame", "QFrame", QFrame)
 	    QFrame:SetWidth(max_X)
@@ -158,54 +207,30 @@ function addon:showQuestionnaire()
 	end
 	if (#questions>5) then
 		        nextPageExists=true
-		        print ("debug")
 		    else
 		        nextPageExists=false
 		    end
 
-	for i=1, #questions do --TODO restore original loop, delete the one for
-	-- debugging
-	--for i=1, 3 do
+	for i=1, QPP  do
 	    changeY= -(i*60)
-	    if (changeY< -359) then --if we've run out of space in our current frame
-	        print ("out of space!!")
-	        break
-	    end
 	    nextQuestion = i+1 --stores next question in QFrame in case we run out of space
 	    tempText = QFrame:CreateFontString("Question"..i, "Overlay", "GameFontNormal")
 	    table.insert(qText, tempText)
 	    qText[i]:ClearAllPoints()
-	    qText[i]:SetPoint("Top", 0, changeY) --TODO fix text positioning
+	    qText[i]:SetPoint("Top", 0, changeY+5) --TODO fix text positioning
 	    qText[i]:SetText(questions[i].prompt)
 
 	    changeX=-200 --reset value of changeX for the next iteration of the following loop
 	    --if not buttonsCreated then
-	        for a=1, 3   do --5 buttons per question
-	            --VIRGINIA: this is the debug printout I showed you in the email.
-	            --This section creates a new set of buttons for every value in the "questions" array, but for some reason
-	            --it seems to vertically override the old buttons.
-	            --Happy hunting :\
-	            --questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
-	            questions[i].buttonSet[a]  = CreateFrame("CheckButton", "RadioButton"..i..","..a, QFrame, "UIRadioButtonTemplate")
-	            print ("And now new address ")
-				print(questions[i].buttonSet[a])
-				for b=1, 5 do --TODO Delete loop, just for debugging
-	              print ("At a = ".. a .."Button ".. b .. " with address ")
-				  print(questions[i].buttonSet[b])
-			    end
-	            print ("------------------")
-	            --questions[i].buttonSet[a].questionIterator = i
-	            questions[i].questionIterator = i
+	        for a=1, 5   do
+	            questions[i].buttonSet[a]  = CreateFrame("CheckButton","RadioButton#("..i..","..a..")", QFrame, "UIRadioButtonTemplate")
 	            questions[i].buttonSet[a]:SetHeight(20)
 	            questions[i].buttonSet[a]:SetWidth(20)
 	            questions[i].buttonSet[a]:ClearAllPoints()
 	            questions[i].buttonSet[a]:SetPoint("TOP", changeX, changeY-12)
+	            --changeY-12 because we want the buttons to be roughly 10 pixels below our question text
 	            questions[i].buttonSet[a]:RegisterForClicks("LeftButtonUp")
-	            --questions[i].buttonSet[a].bNumber = a
-	            --questions[i].buttonSet.bNumber = a
 	            questions[i].buttonSet[a]:SetScript("OnClick", RadioButton_OnClick)
-
-	            --changeY-12 because we want the buttons towwwwwww be roughly 10 pixels below our question text
 
 	            questions[i].bText[a] = questions[i].buttonSet[a]:CreateFontString("ButtonSubtext#("..i..","..a..")", "Overlay", "GameFontNormal")
 	            questions[i].bText[a]:ClearAllPoints()
@@ -219,8 +244,6 @@ function addon:showQuestionnaire()
 	        end -- end radio-button creation (inner for loop)
 	    --end
 	end -- end text creation(outer for loop)
---	print(questions[1].buttonSet[3] )
---	questions[1].buttonSet[3]:SetChecked(true)
 	endButton = CreateFrame("Button", "EndButton", QFrame, "GameMenuButtonTemplate")
 	endButton:ClearAllPoints()
 	endButton:SetPoint("BOTTOM", 0, 10)
@@ -235,13 +258,5 @@ function addon:showQuestionnaire()
 	exitButton = CreateFrame("Button", "ExitButton", QFrame, "UIPanelCloseButton")
 	exitButton:ClearAllPoints()
 	exitButton:SetPoint("TOPRIGHT", 0, 0)
-	--end of initialization section
 -----------------------------------------------------------------------------------------------------------------------------------
 end
-
-
-
---button info @ 1164
---MAIL FUNCTIONS @1074
---SENDMAIL FUNCTION @911
---TODO: write error handler function that passes an error code as arg.
