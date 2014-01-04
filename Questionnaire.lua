@@ -26,9 +26,10 @@ local NUM_QUESTIONS = 0
 local QPP = 0 --questions per page
 ------------------------------------------------------------------------------------------------------------------------------------
 function initQuestionnaire(Qtitle)
+	
     local rTable = addon:getQTable(Qtitle)
-	NUM_QUESTIONS = addon:getQTable(Qtitle).numquestions
-	question_table = addon:getQTable(Qtitle).questionTable
+	NUM_QUESTIONS = rTable.numQuestions
+	question_table =rTable.qTable
     if(NUM_QUESTIONS >=5) then
 		QPP = 5
 	else
@@ -170,6 +171,7 @@ function updateQuestions()
      nextQuestion = nextQuestion+5
 end
 function addon:showQuestionnaire(Qtitle)
+	print("Unpacking " .. Qtitle)
     numPagesLeft = numPagesLeft-1
     local changeY = 0 --zero b/c we need to run comparisons before setting values
     local changeX = nil
