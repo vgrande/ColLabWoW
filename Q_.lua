@@ -12,7 +12,7 @@ function addon:getQTable(Qtitle)
             }
         local returnTable = 
         {
-        	title = "Default",
+        	title = Qtitle,
         	numQuestions = #questionTable,
         	qTable = questionTable,
         }
@@ -29,7 +29,7 @@ function addon:getQTable(Qtitle)
                }
           local returnTable = 
       	 	{
-        	title = "Secondary",
+        	title = Qtitle
         	numQuestions = #questionTable,
         	qTable = questionTable,
         	}
