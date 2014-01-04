@@ -144,9 +144,9 @@ end
 
 SLASH_COLLABWOWQUESTIONNAIRE1 = "/clwq"
 SLASH_COLLABWOWQUESTIONNAIRE2 = "/collabwowquestionnaire"
-SlashCmdList["COLLABWOWQUESTIONNAIRE"] = function ()
+SlashCmdList["COLLABWOWQUESTIONNAIRE"] = function (Qtitle)
 	print "Preparing questionnaire"
-	addon:showQuestionnaire()
+	addon:showQuestionnaire(Qtitle)
 end
 
 
